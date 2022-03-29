@@ -33,4 +33,7 @@ def single_temp(img_path='Assets/img_1.jpg',template_path='Assets/logo_1.png'):
 # running the program
 
 if (__name__) == '__main__':
-    single_temp()
+    #single_temp()
+    img = cv2.imread('Assets/img3.png')
+    cv2.imshow('',img)
+    cv2.waitKey(0)

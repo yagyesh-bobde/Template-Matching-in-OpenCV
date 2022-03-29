@@ -2,45 +2,48 @@ import cv2
 import numpy as np
 from imutils.object_detection import non_max_suppression
 
-def multi_temp(img_path='Assets/img_2.jpg',template_path='Assets/logo_1.png' , thresh=0.2):
-    # Reading the image and template
-    img = cv2.imread(img_path)
-    temp = cv2.imread(template_path)
-    tW,tH = temp.shape[:2]
 
-    # Converting them to grayscale
-    img_gray=cv2.cvtColor(img,cv2.COLOR_BGR2GRAY)
-    temp_gray = cv2.cvtColor(temp,cv2.COLOR_BGR2GRAY)
+# Reading the image and the template
+img = cv2.imread('Assets/img3.png')
+temp = cv2.imread('Assets/logo_2.png')
 
-    # Passing the image to matchTemplate method 
-    detect = cv2.matchTemplate(image=img_gray, templ=temp_gray, method=cv2.TM_CCOEFF_NORMED)
+# save the image dimensions
+W,H = temp.shape[:2]
 
-    (yCoords, xCoords) = np.where(detect >= thresh)
-   
+# Define a minimum threshold 
+thresh=0.4
+
+# Converting them to grayscale
+img_gray=cv2.cvtColor(img,cv2.COLOR_BGR2GRAY)
+temp_gray = cv2.cvtColor(temp,cv2.COLOR_BGR2GRAY)
+
+# Passing the image to matchTemplate method 
+match = cv2.matchTemplate(image=img_gray, templ=temp_gray, method=cv2.TM_CCOEFF_NORMED)
+
+# Select rectangles with confidence greater than threshold
+(y_points, x_points) = np.where(match >= thresh)
+
 # initialize our list of rectangles
-    rects = []
-    # loop over the starting (x, y)-coordinates again
-    for (x, y) in zip(xCoords, yCoords):
-        # update our list of rectangles
-        rects.append((x, y, x + tW, y + tH))
-
-    # apply non-maxima suppression to the rectangles
-    pick = non_max_suppression(np.array(rects))
-    print("[INFO] {} matched locations *after* NMS".format(len(pick)))
+boxes =list()
+# loop over the starting (x, y)-coordinates again
+for (x, y) in zip(x_points, y_points):
+    # update our list of rectangles
+    boxes.append((x, y, x + W, y + H))
     
-    # loop over the final bounding boxes
-    for (startX, startY, endX, endY) in pick:
-        # draw the bounding box on the image
-        cv2.rectangle(img, (startX, startY), (endX, endY),
-            (255, 0, 0), 3)
+# apply non-maxima suppression to the rectangles
+# this will create a single bounding box
+boxes = non_max_suppression(np.array(boxes))
 
-    
-    # show our output image *before* applying non-maxima suppression
-    cv2.imshow("Template" ,temp)
-    cv2.imshow("After NMS", img)
-    cv2.waitKey(0)
+# loop over the final bounding boxes
+for (x1, y1, x2, y2) in boxes:
+    # draw the bounding box on the image
+    cv2.rectangle(img, (x1, y1), (x2, y2),
+    (255, 0, 0),3)
 
+# Show the template and the final output
+cv2.imshow("Template" ,temp)
+cv2.imshow("After NMS", img)
+cv2.waitKey(0)
 
-#running the program: 
-if (__name__) == '__main__':
-    multi_temp()
+# destroy all the windows manually to be on the safe side
+cv2.destroyAllWindows()
