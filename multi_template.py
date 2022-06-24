@@ -4,14 +4,16 @@ from imutils.object_detection import non_max_suppression
 
 
 # Reading the image and the template
-img = cv2.imread('Assets/img3.png')
-temp = cv2.imread('Assets/logo_2.png')
+img = cv2.imread('Assets/img3.jpg')
+temp = cv2.imread('Assets/logo1.jpg')
+
+
 
 # save the image dimensions
 W,H = temp.shape[:2]
 
 # Define a minimum threshold 
-thresh=0.4
+thresh=0.5
 
 # Converting them to grayscale
 img_gray=cv2.cvtColor(img,cv2.COLOR_BGR2GRAY)
@@ -32,6 +34,7 @@ for (x, y) in zip(x_points, y_points):
     
 # apply non-maxima suppression to the rectangles
 # this will create a single bounding box
+
 boxes = non_max_suppression(np.array(boxes))
 
 # loop over the final bounding boxes
@@ -44,6 +47,6 @@ for (x1, y1, x2, y2) in boxes:
 cv2.imshow("Template" ,temp)
 cv2.imshow("After NMS", img)
 cv2.waitKey(0)
-
+cv2.imwrite('output.jpg',img)
 # destroy all the windows manually to be on the safe side
 cv2.destroyAllWindows()
